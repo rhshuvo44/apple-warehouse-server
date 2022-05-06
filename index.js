@@ -33,10 +33,14 @@ app.get('/inventors/:id',async(req,res)=>{
   const item =await ItemsCollection.findOne(query);
   res.send(item)
 })
+app.post('/inventors', async (req,res)=>{
+  const newInventor=req.body;
+  const result = await ItemsCollection.insertOne(newInventor);
+  res.send(result);
+})
 
 }
 finally{
-
 }
 }
 run().catch(console.dur)
