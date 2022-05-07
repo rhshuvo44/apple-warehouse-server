@@ -16,34 +16,59 @@ const client = new MongoClient(uri, {
   useUnifiedTopology: true,
   serverApi: ServerApiVersion.v1,
 });
-async function run(){
-try{
-await client.connect();
-const ItemsCollection = client.db("iphone-warehouse").collection("items");
-console.log("DB connet");
-app.get('/inventors',async(req,res)=>{
-  const query={};
-  const cursor=ItemsCollection.find(query);
-  const items= await cursor.toArray();
-  res.send(items)
-})
-app.get('/inventors/:id',async(req,res)=>{
-  const id=req.params.id;
-  const query ={_id:ObjectId(id)};
-  const item =await ItemsCollection.findOne(query);
-  res.send(item)
-})
-app.post('/inventors', async (req,res)=>{
-  const newInventor=req.body;
-  const result = await ItemsCollection.insertOne(newInventor);
-  res.send(result);
-})
+async function run() {
+  try {
+    await client.connect();
+    const ItemsCollection = client.db("iphone-warehouse").collection("items");
+    console.log("DB connet");
+    app.get("/inventors", async (req, res) => {
+      const query = {};
+      const cursor = ItemsCollection.find(query);
+      const items = await cursor.toArray();
+      res.send(items);
+    });
+    app.get("/inventors/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const item = await ItemsCollection.findOne(query);
+      res.send(item);
+    });
+    //post
+    app.post("/inventors", async (req, res) => {
+      const newInventor = req.body;
+      const result = await ItemsCollection.insertOne(newInventor);
+      res.send(result);
+    });
+    //delete
+    app.delete("/inventors/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const deleted = await ItemsCollection.deleteOne(query);
+      res.send(deleted);
+    });
+    //update
+    app.put("/inventors/:id", async (req, res) => {
+      const id = req.params.id;
+      const updateInventor = req.body;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          quantity: updateInventor.quantity,
+        },
+      };
+      const result = await ItemsCollection.updateOne(
+        filter,
+        updateDoc,
+        options
+      );
 
+      res.send(result);
+    });
+  } finally {
+  }
 }
-finally{
-}
-}
-run().catch(console.dur)
+run().catch(console.dur);
 
 app.get("/", (req, res) => {
   res.send("hello world");
