@@ -83,7 +83,7 @@ async function run() {
 run().catch(console.dur);
 
 app.get("/", (req, res) => {
-  res.send("Iphone-warehouse start");
+  res.send("Iphone-warehouse");
 });
 app.listen(port, () => {
   console.log(`iphone-warehouse start ${port}`);
