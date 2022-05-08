@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
-
+const jwt = require('jsonwebtoken');
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -21,18 +21,30 @@ async function run() {
     await client.connect();
     const ItemsCollection = client.db("iphone-warehouse").collection("items");
     console.log("DB connet");
+    //all data load
     app.get("/inventors", async (req, res) => {
       const query = {};
       const cursor = ItemsCollection.find(query);
       const items = await cursor.toArray();
       res.send(items);
     });
+    // single data load 
     app.get("/inventors/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const item = await ItemsCollection.findOne(query);
       res.send(item);
     });
+    // auth 
+    app.post('/login',async(req,res)=>{
+      const user=req.body;
+      const token=jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{
+        expiresIn:'1d'
+      });
+      
+      res.send({token})
+
+    })
     //post
     app.post("/inventors", async (req, res) => {
       const newInventor = req.body;
